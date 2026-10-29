@@ -12,6 +12,7 @@ import (
 
 	"github.com/refraction-networking/water"
 	v1 "github.com/refraction-networking/water/transport/v1"
+	"github.com/tetratelabs/wazero"
 )
 
 // ExampleRelay demonstrates how to use v1.Relay as a water.Relay.
@@ -92,6 +93,16 @@ func TestRelay(t *testing.T) {
 	t.Run("reverse must work", testRelayReverse)
 }
 
+// newIsolatedRuntimeConfig gives a relay test its own compilation cache.
+// The relay's connections are closed in the background after the test has
+// returned, and closing a connection removes its compiled WATM from the
+// cache.
+func newIsolatedRuntimeConfig() *water.WazeroRuntimeConfigFactory {
+	rcf := water.NewWazeroRuntimeConfigFactory()
+	rcf.SetCompilationCache(wazero.NewCompilationCache())
+	return rcf
+}
+
 func testRelayPlain(t *testing.T) { // skipcq: GO-R1005
 	// test destination: a local TCP server
 	tcpLis, err := net.ListenTCP("tcp", &net.TCPAddr{IP: net.IPv4(127, 0, 0, 1), Port: 0})
@@ -111,8 +122,9 @@ func testRelayPlain(t *testing.T) { // skipcq: GO-R1005
 
 	// setup relay
 	config := &water.Config{
-		TransportModuleBin:  wasmPlain,
-		ModuleConfigFactory: water.NewWazeroModuleConfigFactory(),
+		TransportModuleBin:   wasmPlain,
+		ModuleConfigFactory:  water.NewWazeroModuleConfigFactory(),
+		RuntimeConfigFactory: newIsolatedRuntimeConfig(),
 	}
 	relay, err := v1.NewRelayWithContext(context.Background(), config)
 	if err != nil {
@@ -240,8 +252,9 @@ func testRelayReverse(t *testing.T) { // skipcq: GO-R1005
 
 	// setup relay
 	config := &water.Config{
-		TransportModuleBin:  wasmReverse,
-		ModuleConfigFactory: water.NewWazeroModuleConfigFactory(),
+		TransportModuleBin:   wasmReverse,
+		ModuleConfigFactory:  water.NewWazeroModuleConfigFactory(),
+		RuntimeConfigFactory: newIsolatedRuntimeConfig(),
 	}
 	relay, err := water.NewRelayWithContext(context.Background(), config)
 	if err != nil {

@@ -172,8 +172,8 @@ func (c *Conn) closeOnWorkerError() {
 	}
 	c.tmMutex.Unlock()
 
-	<-tm.WorkerErrored()
-	log.LDebugf(core.Logger(), "water: WATMv0: worker thread returned")
+	err := <-tm.WorkerErrored()
+	log.LDebugf(core.Logger(), "water: WATMv0: worker thread returned: %v", err)
 	c.Close()
 }
 

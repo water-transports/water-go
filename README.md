@@ -196,8 +196,8 @@ Currently, it supports the following platforms:
 	* `linux/amd64` on Ubuntu Latest
 	* `linux/arm64` via [docker/setup-qemu-action](https://github.com/docker/setup-qemu-action)
 	* `linux/riscv64` via [docker/setup-qemu-action](https://github.com/docker/setup-qemu-action)
-	* `macos/amd64` on macOS 12
-	* `macos/arm64` on macOS 14
+	* `macos/amd64` on macOS 26 (Intel)
+	* `macos/arm64` on macOS 26 (Apple Silicon)
 	* `windows/amd64` on Windows Latest
 
 * We thank [FlyCI.net](https://www.flyci.net) for providing GitHub Actions runners on `macos/arm64` (Apple M1) _in the past_. (We switched to GitHub's `macos-14` runner as of Jan 31 2024)

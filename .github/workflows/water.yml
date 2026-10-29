@@ -21,11 +21,11 @@ jobs:
     strategy:
       matrix:
         os: [ "ubuntu", "windows" ] 
-        go: [ "1.21.x", "1.22.x" ] # we support the latest 2 stable versions of Go
+        go: [ "1.26.x", "1.27.x" ] # we support the latest 2 stable versions of Go
     runs-on: ${{ matrix.os }}-latest # use latest OS image
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-go@v5
+    - uses: actions/checkout@v7
+    - uses: actions/setup-go@v7
       with:
         go-version: ${{ matrix.go }}
     - run: go version
@@ -38,17 +38,17 @@ jobs:
     name: go${{ matrix.go }} (linux/${{ matrix.arch }})
     strategy:
       matrix:
-        go: [ "1.21.x", "1.22.x" ] # we support the latest 2 stable versions of Go
+        go: [ "1.26.x", "1.27.x" ] # we support the latest 2 stable versions of Go
         arch: [ "arm64", "riscv64" ]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
     - name: Set up
-      uses: actions/setup-go@v5
+      uses: actions/setup-go@v7
       with:
         go-version: ${{ matrix.go }}
     - name: Install QEMU
-      uses: docker/setup-qemu-action@v3
+      uses: docker/setup-qemu-action@v4
     - name: Build and Test
       run:  |
         GOARCH=${{ matrix.arch }} go build -v ./...
@@ -58,11 +58,11 @@ jobs:
     name: go${{ matrix.go }} (macos/amd64)
     strategy:
       matrix:
-        go: [ "1.21.x", "1.22.x" ] # we support the latest 2 stable versions of Go
-    runs-on: macos-12
+        go: [ "1.26.x", "1.27.x" ] # we support the latest 2 stable versions of Go
+    runs-on: macos-26-intel
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-go@v5
+    - uses: actions/checkout@v7
+    - uses: actions/setup-go@v7
       with:
         go-version: ${{ matrix.go }}
     - run: go version
@@ -75,11 +75,11 @@ jobs:
     name: go${{ matrix.go }} (macos/arm64)
     strategy:
       matrix:
-        go: [ "1.21.x", "1.22.x" ] # we support the latest 2 stable versions of Go
-    runs-on: macos-14
+        go: [ "1.26.x", "1.27.x" ] # we support the latest 2 stable versions of Go
+    runs-on: macos-26
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-go@v5
+    - uses: actions/checkout@v7
+    - uses: actions/setup-go@v7
       with:
         go-version: ${{ matrix.go }}
     - run: go version
@@ -94,10 +94,10 @@ jobs:
     env:
       CGO_ENABLED: 1 # go: -race requires cgo; enable cgo by setting CGO_ENABLED=1
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-go@v5
+    - uses: actions/checkout@v7
+    - uses: actions/setup-go@v7
       with:
-        go-version: "1.22.x"
+        go-version: "1.27.x"
     - run: go version
     - name: Go Test
       run: go test -race ./...
@@ -106,16 +106,15 @@ jobs:
     name: lint
     runs-on: "ubuntu-latest"
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
         with:
-          go-version: "1.22.x"
+          go-version: "1.27.x"
           cache: false
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v4
+        uses: golangci/golangci-lint-action@v9
         with:
-          # Require: The version of golangci-lint to use.
-          # When `install-mode` is `binary` (default) the value can be v1.2 or v1.2.3 or `latest` to use the latest version.
-          # When `install-mode` is `goinstall` the value can be v1.2.3, `latest`, or the hash of a commit.
-          version: v1.54
-          args: -v --disable structcheck,govet --timeout 5m
+           # When `install-mode` is `binary` (default) the value can be v2.1 or v2.1.3 or `latest` to use the latest version.
+           # When `install-mode` is `goinstall` the value can be v2.1.3, `latest`, or the hash of a commit.
+          version: v2.15
+          args: -v

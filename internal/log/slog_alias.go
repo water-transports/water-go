@@ -1,5 +1,3 @@
-//go:build go1.21
-
 package log
 
 import (
@@ -7,8 +5,7 @@ import (
 )
 
 // Logger is an alias for slog.Logger. It is used here to avoid
-// importing slog in the rest of the code, since slog needs to be
-// imported conditionally based on the Go version.
+// importing slog in the rest of the code.
 type Logger = slog.Logger
 type Handler = LogHandler // Deprecated: use LogHandler. The naming of this type is ambiguous.
 type LogHandler = slog.Handler

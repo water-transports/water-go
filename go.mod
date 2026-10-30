@@ -1,6 +1,6 @@
 module github.com/refraction-networking/water
 
-go 1.21
+go 1.26.0
 
 retract (
 	v0.6.1 // bad submodule

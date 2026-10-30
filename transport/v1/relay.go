@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"sync"
 	"sync/atomic"
 
 	"github.com/refraction-networking/water"
@@ -18,9 +19,10 @@ func init() {
 
 // Relay implements [water.Relay] utilizing Water WATM API v1.
 type Relay struct {
-	config  *water.Config
-	ctx     context.Context
-	running *atomic.Bool
+	config   *water.Config
+	configMu sync.RWMutex // guards config: ListenAndRelayTo replaces it while Addr/Close may read it
+	ctx      context.Context
+	running  *atomic.Bool
 
 	dialNetwork, dialAddress string
 
@@ -100,7 +102,9 @@ func (r *Relay) ListenAndRelayTo(lnetwork, laddress, rnetwork, raddress string) 
 
 	config := r.config.Clone()
 	config.NetworkListener = lis
+	r.configMu.Lock()
 	r.config = config
+	r.configMu.Unlock()
 
 	if r.config == nil {
 		return fmt.Errorf("water: relaying with nil config is not allowed")
@@ -134,8 +138,11 @@ func (r *Relay) Close() error {
 		return nil
 	}
 
-	if r.config != nil {
-		return r.config.NetworkListener.Close()
+	r.configMu.RLock()
+	config := r.config
+	r.configMu.RUnlock()
+	if config != nil && config.NetworkListener != nil {
+		return config.NetworkListener.Close()
 	}
 
 	return fmt.Errorf("water: relay is not configured")
@@ -143,9 +150,12 @@ func (r *Relay) Close() error {
 
 // Addr implements [water.Relay].
 func (r *Relay) Addr() net.Addr {
-	if r.config == nil {
+	r.configMu.RLock()
+	config := r.config
+	r.configMu.RUnlock()
+	if config == nil || config.NetworkListener == nil {
 		return nil
 	}
 
-	return r.config.NetworkListener.Addr()
+	return config.NetworkListener.Addr()
 }

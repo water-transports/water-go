@@ -1,0 +1,27 @@
+# golangci-lint v2 configuration, https://golangci-lint.run/docs/configuration/file/
+version: "2"
+
+run:
+  timeout: 5m
+
+linters:
+  default: standard # errcheck, govet, ineffassign, staticcheck, unused
+  disable:
+    - govet
+  settings:
+    staticcheck:
+      checks:
+        - all
+        - -ST* # stylecheck
+        - -QF* # quickfix
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - (^|/)examples($|/)
+      - third_party$
+      - builtin$

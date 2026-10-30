@@ -42,7 +42,9 @@ func ExampleRelay() {
 			panic(err)
 		}
 	}()
-	time.Sleep(100 * time.Millisecond) // 100ms to spin up relay
+	for i := 0; waterRelay.Addr() == nil && i < 500; i++ {
+		time.Sleep(10 * time.Millisecond) // wait (up to 5s) for relay to start listening
+	}
 
 	// test source: a local TCP client
 	clientConn, err := net.Dial("tcp", waterRelay.Addr().String())
@@ -135,7 +137,9 @@ func testRelayPlain(t *testing.T) { // skipcq: GO-R1005
 		relayErr = relay.ListenAndRelayTo("tcp", "localhost:0", "tcp", tcpLis.Addr().String())
 		relayWg.Done()
 	}()
-	time.Sleep(100 * time.Millisecond) // 100ms to spin up relay
+	for i := 0; relay.Addr() == nil && i < 500; i++ {
+		time.Sleep(10 * time.Millisecond) // wait (up to 5s) for relay to start listening
+	}
 
 	// test source: a local TCP client
 	clientConn, err := net.Dial("tcp", relay.Addr().String())
@@ -265,7 +269,9 @@ func testRelayReverse(t *testing.T) { // skipcq: GO-R1005
 		relayErr = relay.ListenAndRelayTo("tcp", "localhost:0", "tcp", tcpLis.Addr().String())
 		relayWg.Done()
 	}()
-	time.Sleep(100 * time.Millisecond) // 100ms to spin up relay
+	for i := 0; relay.Addr() == nil && i < 500; i++ {
+		time.Sleep(10 * time.Millisecond) // wait (up to 5s) for relay to start listening
+	}
 
 	// test source: a local TCP client
 	clientConn, err := net.Dial("tcp", relay.Addr().String())

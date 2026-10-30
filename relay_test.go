@@ -45,7 +45,9 @@ func ExampleRelay() {
 			panic(err)
 		}
 	}()
-	time.Sleep(100 * time.Millisecond) // 100ms to spin up relay
+	for i := 0; waterRelay.Addr() == nil && i < 500; i++ {
+		time.Sleep(10 * time.Millisecond) // wait (up to 5s) for relay to start listening
+	}
 
 	// test source: a local TCP client
 	clientConn, err := net.Dial("tcp", waterRelay.Addr().String())

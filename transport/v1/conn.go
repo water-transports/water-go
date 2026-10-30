@@ -237,6 +237,10 @@ func (c *Conn) closeOnWorkerError() {
 	}
 	c.tmMutex.Unlock()
 
+	if tm == nil { // the Conn was closed before this goroutine started
+		return
+	}
+
 	if err := tm.WaitWorker(); err != nil { // block until worker thread returns
 		log.LErrorf(core.Logger(), "water: WATMv1: worker thread returned with error: %v", err)
 		c.Close()
